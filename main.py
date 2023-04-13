@@ -2,12 +2,13 @@
 #_*_ codig: utf8 _*_
 import psycopg2, sys, traceback, json
 #from dateutil.relativedelta import relativedelta
-import datetime
+import datetime, time
 from Modules.functions import *
 from Modules.constants import *
 
 if __name__ == '__main__':
 	#-------Variables------------------------------------------------------------------------
+	beginning=time.time() ##Captura del dato de hora y fecha al momento de empezar la ejecucion del codigo
 	dict={} #-Diccionario para guardar datos para escribir en el log de eventos
 	count_manifests_deleted=0 #-Contador de manifest eliminados
 	count_playbacks_registered=0 #-Contador de playbacks registrdos
@@ -135,6 +136,8 @@ if __name__ == '__main__':
 		postgresql.close() #-Se cierra la conexion a la base de datos 
 		manifest_registered=str(len(list_new_manifest)-count_manifests_deleted) #-Se establece la cantidad de manifests registrados 
 		dict["Playbacks_Registered"]=str(count_playbacks_registered) #-Se agraga al diccionario la cantidad de playbacks registrados
+		finish=time.time() ##Se almacena el dato de hora y fecha al finalizar las consultas SQL
+		dict['Process_duration']=str(round((finish-beginning),3)) #Se asigna a la clave Process_duration del diccionario dict el calculo de la duracion del proceso.
 		dict_str_json=json.dumps(dict, sort_keys=False, indent=8) #-Se da formato tipo json al diccionario
 #-------Se crea el archivo log que guarda el resumen de la ejecucion
 		SendMail(str(dict_str_json), "Playbacks execution summary") #-Uso de la funcion SendMail para enviar email con el resumen de la ejecucion
